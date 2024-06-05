@@ -1,3 +1,5 @@
+// Header files to be included for Fingerprint sensor and Oled display
+
 #include <Adafruit_Fingerprint.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
@@ -26,19 +28,19 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
 
 // WiFi credentials
-const char* ssid = "Naveen";
-const char* password = "9553287950";
+const char* ssid = "*****";
+const char* password = "*********";
 
 // Google Sheets script URL
-String serverName = "https://script.google.com/macros/s/AKfycbxGfQf9NoNtuf6KNynVebPVXOeW1SbLi8F4qtREIjpbAIdIbiglGCbM6RqmrlR6YeCo/exec";
+String serverName = "Place YOUR HTTP google sheets link here........";
 
 // Define fingerprint ID to name mappings
 // Add additional IDs as needed
 #define RAMU 9
-#define HEMANTH 1
-#define NAVEEN 12
-#define YUKTHI 11
-#define JAGGU 13
+#define joy 1
+#define Navi 12
+#define yamini 11
+#define goerge 13
 
 // Timing variables
 unsigned long lastTime = 0;
