@@ -43,9 +43,11 @@ String serverName = "https://script.google.com/macros/s/AKfycbxGfQf9NoNtuf6KNynV
 // Timing variables
 unsigned long lastTime = 0;
 unsigned long timerDelay = 1000; 
+//  digitalWrite(buz,LOW);
 
 void setup() {
   pinMode(buz,OUTPUT);
+  digitalWrite(buz,LOW);
   Serial.begin(9600);
   while (!Serial);
   delay(100);
@@ -73,6 +75,13 @@ void setup() {
   }
   Serial.println("");
   Serial.print("Connected to WiFi network with IP Address: ");
+        display.clearDisplay();
+      display.setTextSize(1.5);
+      display.setTextColor(SSD1306_WHITE);
+      display.setCursor(0,0);
+      display.println("WiFi Connected ");
+
+      display.display();
   Serial.println(WiFi.localIP());
 
   // Initialize fingerprint sensor
@@ -120,22 +129,29 @@ void loop() {
         name = "Hemanth";
       } else if (id == NAVEEN) {
         name = "Naveen";
-      } 
-      else if (id == JAGGU) {
+      } else if (id == JAGGU) {
         name = "JAGGU";
-      }
-        else {
+      } else {
         name = "Unknown";
       }
 
-if (name != "Unknown") { // Check if the fingerprint is recognized
+      if (name != "Unknown") { // Check if the fingerprint is recognized
         // Display name and status on OLED
         display.clearDisplay();
         display.setTextSize(2);
         display.setTextColor(SSD1306_WHITE);
+        
+        // Name column
         display.setCursor(0, 0);
-        display.println("Name: " + name);
-        display.println("Status: Finger Found");
+      
+        display.println(" "+name );
+        
+        // Status column
+
+        display.setCursor(125, 0);
+        display.println("\n");
+        display.println(" Verified ");
+
         display.display();
         digitalWrite(buz, HIGH);
         delay(150);
@@ -143,47 +159,52 @@ if (name != "Unknown") { // Check if the fingerprint is recognized
 
         // Send data to Google Sheets
         if (WiFi.status() == WL_CONNECTED) {
-            WiFiClientSecure client;
-            client.setInsecure(); // Bypass SSL verification for testing
+          WiFiClientSecure client;
+          client.setInsecure(); // Bypass SSL verification for testing
 
-            HTTPClient http;
+          HTTPClient http;
 
-            String serverPath = serverName + "?value1=" + String(id) + "&value2=" + name;
+          String serverPath = serverName + "?value1=" + String(id) + "&value2=" + name;
 
-            // Send HTTP GET request
-            http.begin(client, serverPath.c_str());
-            int httpResponseCode = http.GET();
+          // Send HTTP GET request
+          http.begin(client, serverPath.c_str());
+          int httpResponseCode = http.GET();
 
-            if (httpResponseCode > 0) {
-                Serial.print("HTTP Response code: ");
-                Serial.println(httpResponseCode);
-                String payload = http.getString();
-                Serial.println(payload);
-            } else {
-                Serial.print("Error code: ");
-                Serial.println(httpResponseCode);
-            }
-            http.end();
+          if (httpResponseCode > 0) {
+            Serial.print("HTTP Response code: ");
+            Serial.println(httpResponseCode);
+            String payload = http.getString();
+            Serial.println(payload);
+          } else {
+            Serial.print("Error code: ");
+            Serial.println(httpResponseCode);
+          }
+          http.end();
         } else {
-            Serial.println("WiFi Disconnected");
+          Serial.println("WiFi Disconnected");
         }
-    }
-}else {
+      }
+    } else {
       // Display status on OLED
       display.clearDisplay();
       display.setTextSize(2);
       display.setTextColor(SSD1306_WHITE);
-      display.setCursor(0,0);
-      display.println("Status: No Finger Found");
+      
+      // Status column
+
+      display.setCursor(0, 0);
+      display.println(" No Finger");
+            display.setCursor(125, 0);
+            display.println("\n");
+      display.println("  Found  ");
+
       display.display();
-
-
     }
     // Update the last time the GET request was sent
     lastTime = millis();
   }
+}
 
-  }
 
 int getFingerprintID() {
   uint8_t p = finger.getImage();
